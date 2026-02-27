@@ -1,5 +1,5 @@
-using System.Collections.Concurrent;
-using MealsCollection = System.Collections.Concurrent.ConcurrentDictionary<int, string>;
+using ReadOnlyMealsCollection = System.Collections.Generic.IReadOnlyDictionary<int, MealPlanner.Domain.Meal>;
+using MealsCollection = System.Collections.Concurrent.ConcurrentDictionary<int, MealPlanner.Domain.Meal>;
 
 namespace MealPlanner.Domain;
 
@@ -11,7 +11,7 @@ public class DailyMenu
     
     public DateOnly Date { get; private set; }
     
-    public IReadOnlyDictionary<int, string> Meals
+    public ReadOnlyMealsCollection Meals
     {
         get => _meals;
         private set => value.ToList().ForEach(TryAddMeal);
@@ -23,17 +23,17 @@ public class DailyMenu
         Meals = meals;
     }
 
-    public void AddMeal(string meal) => AddMeal(Meals.Keys.Count(), meal);
+    public void AddMeal(Meal meal) => AddMeal(Meals.Keys.Count(), meal);
 
-    public void AddMeal(int order, string meal) => TryAddMeal(order, meal);
+    public void AddMeal(int order, Meal meal) => TryAddMeal(order, meal);
 
-    private void TryAddMeal(KeyValuePair<int, string> mealAndOrder)
+    private void TryAddMeal(KeyValuePair<int, Meal> mealAndOrder)
     {
         mealAndOrder.Deconstruct(out var order, out var meal);
         TryAddMeal(order, meal);
     }
 
-    private void TryAddMeal(int order, string meal)
+    private void TryAddMeal(int order, Meal meal)
     {
         ValidateOrderAndThrow(order);
         ValidateMealAndThrow(meal);
@@ -62,20 +62,14 @@ public class DailyMenu
         }
     }
 
-    private void ValidateMealAndThrow(string meal)
+    private void ValidateMealAndThrow(Meal meal)
     {
-        if (string.IsNullOrWhiteSpace(meal))
-        {
-            throw new  ArgumentNullException(null, "Please specify a meal to add.");
-        }
         if (_meals.Values.Any(meal.Equals))
         {
             throw new InvalidOperationException($"Meal '{meal}' is already present in the daily menu for {Date}.");
         }
-
     }
     
-
     public static DailyMenu Create(DateOnly date)
     {
         ValidateDateAndThrow(date);
