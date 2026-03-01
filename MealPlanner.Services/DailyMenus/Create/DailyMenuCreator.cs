@@ -10,12 +10,16 @@ public interface ICreateDailyMenu
 
 public class DailyMenuCreator : ICreateDailyMenu
 {
-    private static IDictionary<Guid, DailyMenu> IN_MEMORY_DATABASE = new ConcurrentDictionary<Guid, DailyMenu>();
-    
     public Task<Response> Create(Request request)
     {
         try
         {
+            var existingMenuForDay = InMemoryDatabase.Database.Values.FirstOrDefault(x => x.Date == request.Date);
+            if (existingMenuForDay is not null)
+            {
+                throw new InvalidOperationException($"There is already a Daily Menu defined for {request.Date}.");
+            }
+            
             var result = DailyMenu.Create(request.Date);
             if (request.Meals is not null)
             {
@@ -24,7 +28,7 @@ public class DailyMenuCreator : ICreateDailyMenu
             }
 
             var id = Guid.NewGuid();
-            IN_MEMORY_DATABASE[id] = result;
+            InMemoryDatabase.Database[id] = result;
 
             return Task.FromResult(new Response(id));
         }
