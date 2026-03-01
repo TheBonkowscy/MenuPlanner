@@ -1,3 +1,5 @@
+using MealPlanner.Services.DailyMenus.Create;
+
 namespace MealPlanner.API.DailyMenu;
 
 public static class Extensions
@@ -10,6 +12,12 @@ public static class Extensions
             .WithDisplayName("Create Daily Menu")
             .WithGroupName(OpenApiGroupName);
 
+        return Task.CompletedTask;
+    }
+
+    public static Task RegisterDailyMenuServices(this IServiceCollection services)
+    {
+        services.AddTransient<ICreateDailyMenu, DailyMenuCreator>();
         return Task.CompletedTask;
     }
 }

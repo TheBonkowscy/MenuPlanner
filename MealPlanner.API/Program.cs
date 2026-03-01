@@ -1,5 +1,4 @@
 using MealPlanner.API.DailyMenu;
-using Endpoint = MealPlanner.API.DailyMenu.Create.Endpoint;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddHttpContextAccessor();
+await builder.Services.RegisterDailyMenuServices();
 
 var app = builder.Build();
 
