@@ -5,8 +5,10 @@ namespace MealPlanner.API.DailyMenus.Read;
 
 public static class Endpoint
 {
-    public const string Address = "/daily-menu/{id:guid}";
+    public const string Address = Constants.EndpointPrefix + "/{id:guid}";
     
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public static async Task<IResult> Read(
         [FromServices] IReadDailyMenu dailyMenuReader,
         [FromRoute(Name = "id")] Guid id)

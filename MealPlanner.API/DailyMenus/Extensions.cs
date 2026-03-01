@@ -5,17 +5,15 @@ namespace MealPlanner.API.DailyMenus;
 
 public static class Extensions
 {
-    private const string OpenApiGroupName = "Daily Menu";
-
     public static Task UseDailyMenuEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost(Create.Endpoint.Address, Create.Endpoint.Create)
             .WithDisplayName("Create Daily Menu")
-            .WithGroupName(OpenApiGroupName);
+            .WithTags(Constants.OpenApiGroupName);
         
         app.MapGet(Read.Endpoint.Address, Read.Endpoint.Read)
             .WithDisplayName("Read Daily Menu")
-            .WithGroupName(OpenApiGroupName);
+            .WithTags(Constants.OpenApiGroupName);
 
         return Task.CompletedTask;
     }
