@@ -1,3 +1,4 @@
+using MealPlanner.Services;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
@@ -11,8 +12,12 @@ public class IntegrationTestBase : IClassFixture<MealPlannerWebApplicationFactor
         BaseAddress = new Uri("https://localhost:5001"),
         AllowAutoRedirect = true
     };
+    
+    protected IServiceScope ServiceScope => _factory.Services.CreateScope();
 
     public HttpClient Client => _factory.CreateClient(_options);
+    
+    protected InMemoryDatabase ctx => ServiceScope.ServiceProvider.GetRequiredService<InMemoryDatabase>() ?? throw new Exception("Could not retrieve database instance");
 
     public void Dispose()
     {

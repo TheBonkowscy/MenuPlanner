@@ -1,7 +1,7 @@
 using MealPlanner.Services.DailyMenus.Create;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MealPlanner.API.DailyMenu.Create;
+namespace MealPlanner.API.DailyMenus.Create;
 
 public static class Endpoint
 {

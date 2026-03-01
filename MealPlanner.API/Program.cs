@@ -1,4 +1,4 @@
-using MealPlanner.API.DailyMenu;
+using MealPlanner.API.DailyMenus;
 using MealPlanner.Services;
 
 var builder = WebApplication.CreateBuilder(args);

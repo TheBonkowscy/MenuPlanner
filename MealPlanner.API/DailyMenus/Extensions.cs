@@ -1,6 +1,7 @@
 using MealPlanner.Services.DailyMenus.Create;
+using MealPlanner.Services.DailyMenus.Read;
 
-namespace MealPlanner.API.DailyMenu;
+namespace MealPlanner.API.DailyMenus;
 
 public static class Extensions
 {
@@ -11,6 +12,10 @@ public static class Extensions
         app.MapPost(Create.Endpoint.Address, Create.Endpoint.Create)
             .WithDisplayName("Create Daily Menu")
             .WithGroupName(OpenApiGroupName);
+        
+        app.MapGet(Read.Endpoint.Address, Read.Endpoint.Read)
+            .WithDisplayName("Read Daily Menu")
+            .WithGroupName(OpenApiGroupName);
 
         return Task.CompletedTask;
     }
@@ -18,6 +23,7 @@ public static class Extensions
     public static Task RegisterDailyMenuServices(this IServiceCollection services)
     {
         services.AddTransient<ICreateDailyMenu, DailyMenuCreator>();
+        services.AddTransient<IReadDailyMenu, DailyMenuReader>();
         return Task.CompletedTask;
     }
 }
