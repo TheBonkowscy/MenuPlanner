@@ -1,4 +1,5 @@
 using MealPlanner.API.DailyMenu;
+using MealPlanner.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton<InMemoryDatabase>();
 await builder.Services.RegisterDailyMenuServices();
 
 var app = builder.Build();
@@ -18,7 +21,7 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "My API V1");
+        options.SwaggerEndpoint("/openapi/v1.json", "Meal Planner API v1");
     });
 }
 
