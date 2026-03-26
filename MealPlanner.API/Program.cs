@@ -1,5 +1,6 @@
 using MealPlanner.API.DailyMenus;
 using MealPlanner.Services;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddControllers();
 
 builder.Services.AddSingleton<InMemoryDatabase>();
 await builder.Services.RegisterDailyMenuServices();
@@ -27,6 +30,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-await app.UseDailyMenuEndpoints();
+app.MapControllers();
 
 app.Run();

@@ -1,12 +1,11 @@
 using System.Net;
 using AwesomeAssertions;
+using MealPlanner.API.DailyMenus;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
 using MealPlanner.Shared.DailyMenus.Requests;
 using MealPlanner.Shared.DailyMenus.Responses;
 using Xunit;
-using Create = MealPlanner.API.DailyMenus.Create;
-using Read = MealPlanner.API.DailyMenus.Read;
 
 namespace MealPlanner.API.Tests;
 
@@ -23,7 +22,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         var request = new CreateDailyMenuRequest(Tomorrow);
         
         // Act
-        var result = await Client.PostAsJsonAsync(Create.Endpoint.Address, request);
+        var result = await Client.PostAsJsonAsync(Constants.EndpointPrefix, request);
         
         // Assert
         result.EnsureSuccessStatusCode();
@@ -40,7 +39,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         ctx.Database[dailyMenu.Id] = dailyMenu;
         
         // Act
-        var result = await Client.GetAsync(Read.ByIdEndpoint.Address.Replace("{id:guid}", dailyMenu.Id.ToString()));
+        var result = await Client.GetAsync(BuildGetRoute(dailyMenu.Id));
         
         // Assert
         result.EnsureSuccessStatusCode();
@@ -54,7 +53,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
     public async Task Get_ById_ReturnsNotFound_WhenDailyMenuDoesNotExist()
     {
         // Act
-        var result = await Client.GetAsync(Read.ByIdEndpoint.Address.Replace("{id:guid}", Guid.NewGuid().ToString()));
+        var result = await Client.GetAsync(BuildGetRoute(Guid.NewGuid()));
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -64,7 +63,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
     public async Task Get_ForSpecificDate_ReturnsNotFound_WhenDailyMenuDoesNotExist()
     {
         // Act
-        var result = await Client.GetAsync(Read.ForSpecificDateEndpoint.Address.Replace("{day:datetime}", SpecificDate.ToShortDateString()));
+        var result = await Client.GetAsync(BuildGetRoute(SpecificDate));
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -78,7 +77,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         ctx.Database[dailyMenu.Id] = dailyMenu;
         
         // Act
-        var result = await Client.GetAsync(Read.ForSpecificDateEndpoint.Address.Replace("{day:datetime}", dailyMenu.Date.ToString("O")));
+        var result = await Client.GetAsync(BuildGetRoute(dailyMenu.Date));
         
         // Assert
         result.EnsureSuccessStatusCode();
@@ -92,7 +91,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
     public async Task Get_ForToday_ReturnsNotFound_WhenDailyMenuDoesNotExist()
     {
         // Act
-        var result = await Client.GetAsync(Read.ForTodayEndpoint.Address);
+        var result = await Client.GetAsync(BuildGetForTodayRoute());
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -106,7 +105,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         ctx.Database[dailyMenu.Id] = dailyMenu;
         
         // Act
-        var result = await Client.GetAsync(Read.ForTodayEndpoint.Address);
+        var result = await Client.GetAsync(BuildGetForTodayRoute());
         
         // Assert
         result.EnsureSuccessStatusCode();
@@ -115,4 +114,10 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         response.Id.Should().Be(dailyMenu.Id);
         response.Date.Should().Be(Today);
     }
+
+    private static string BuildGetRoute(Guid id) => $"{Constants.EndpointPrefix}/{id.ToString()}";
+
+    private static string BuildGetRoute(DateOnly date) => $"{Constants.EndpointPrefix}/{date.ToString("O")}";
+    
+    private static string BuildGetForTodayRoute() => $"{Constants.EndpointPrefix}/today";
 }
