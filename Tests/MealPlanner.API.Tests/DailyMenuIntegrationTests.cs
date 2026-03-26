@@ -2,11 +2,10 @@ using System.Net;
 using AwesomeAssertions;
 using MealPlanner.API.Tests.Shared;
 using MealPlanner.Domain;
-using MealPlanner.Services.DailyMenus.Create;
+using MealPlanner.Shared.DailyMenus.Requests;
+using MealPlanner.Shared.DailyMenus.Responses;
 using Xunit;
-using CreateResponse = MealPlanner.Services.DailyMenus.Create.Response;
 using Create = MealPlanner.API.DailyMenus.Create;
-using ReadResponse = MealPlanner.Services.DailyMenus.Read.Response;
 using Read = MealPlanner.API.DailyMenus.Read;
 
 namespace MealPlanner.API.Tests;
@@ -21,14 +20,14 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
     public async Task Post_ReturnsId()
     {
         // Arrange
-        var request = new Request(Tomorrow);
+        var request = new CreateDailyMenuRequest(Tomorrow);
         
         // Act
         var result = await Client.PostAsJsonAsync(Create.Endpoint.Address, request);
         
         // Assert
         result.EnsureSuccessStatusCode();
-        var response = await result.Content.ReadFromJsonAsync<CreateResponse>();
+        var response = await result.Content.ReadFromJsonAsync<CreateDailyMenuResponse>();
         response.Should().NotBeNull();
         response.Id.Should().NotBe(Guid.Empty);
     }
@@ -45,7 +44,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         
         // Assert
         result.EnsureSuccessStatusCode();
-        var response = await result.Content.ReadFromJsonAsync<ReadResponse>();
+        var response = await result.Content.ReadFromJsonAsync<GetDailyMenuResponse>();
         response.Should().NotBeNull();
         response.Id.Should().Be(dailyMenu.Id);
         response.Date.Should().Be(dailyMenu.Date);
@@ -83,7 +82,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         
         // Assert
         result.EnsureSuccessStatusCode();
-        var response = await result.Content.ReadFromJsonAsync<ReadResponse>();
+        var response = await result.Content.ReadFromJsonAsync<GetDailyMenuResponse>();
         response.Should().NotBeNull();
         response.Id.Should().Be(dailyMenu.Id);
         response.Date.Should().Be(dailyMenu.Date);
@@ -111,7 +110,7 @@ public class DailyMenuIntegrationTests : IntegrationTestBase
         
         // Assert
         result.EnsureSuccessStatusCode();
-        var response = await result.Content.ReadFromJsonAsync<ReadResponse>();
+        var response = await result.Content.ReadFromJsonAsync<GetDailyMenuResponse>();
         response.Should().NotBeNull();
         response.Id.Should().Be(dailyMenu.Id);
         response.Date.Should().Be(Today);

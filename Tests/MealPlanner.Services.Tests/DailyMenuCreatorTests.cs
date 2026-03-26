@@ -1,5 +1,6 @@
 ﻿using AwesomeAssertions;
 using MealPlanner.Services.DailyMenus.Create;
+using MealPlanner.Shared.DailyMenus.Requests;
 
 namespace MealPlanner.Services.Tests;
 
@@ -18,10 +19,10 @@ public class DailyMenuCreatorTests
     
     [Theory]
     [MemberData(nameof(ValidCreateRequests))]
-    public async Task Create_CreatesSuccessfully_ReturnsId(Request request)
+    public async Task Create_CreatesSuccessfully_ReturnsId(CreateDailyMenuRequest createDailyMenuRequest)
     {
         // Act
-        var result = await _sut.Create(request);
+        var result = await _sut.Create(createDailyMenuRequest);
         
         // Assert
         result.Should().NotBeSameAs(Guid.Empty);
@@ -35,12 +36,12 @@ public class DailyMenuCreatorTests
     {
         // Arrange
         var tomorrow =  DateOnly.FromDateTime(DateTime.Today.AddDays(1));
-        var request = new Request(tomorrow, [MealName]);
+        var request = new CreateDailyMenuRequest(tomorrow, [MealName]);
         await _sut.Create(request);
-        var conflictingRequest = new Request(tomorrow, ["Pierogi"]);
+        var conflictingRequest = new CreateDailyMenuRequest(tomorrow, ["Pierogi"]);
 
         // Act
-        var createWithConflict = async (Request req) => await _sut.Create(req);
+        var createWithConflict = async (CreateDailyMenuRequest req) => await _sut.Create(req);
         
         // Assert
         await createWithConflict.Awaiting(x => x.Invoke(conflictingRequest))
@@ -51,12 +52,12 @@ public class DailyMenuCreatorTests
         _ctx.Database.Clear();
     }
 
-    public static TheoryData<Request> ValidCreateRequests
+    public static TheoryData<CreateDailyMenuRequest> ValidCreateRequests
     {
         get
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
-            var data = new TheoryData<Request>
+            var data = new TheoryData<CreateDailyMenuRequest>
             {
                 new(today, [MealName]),
                 new(today.AddDays(1), []),
