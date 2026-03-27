@@ -23,7 +23,7 @@ public class MenuReader(InMemoryDatabase ctx) : IReadMenu
 
     private static Task<GetMenuResponse?> MapMenu(Menu menu)
     {
-        var mappedMeals = menu.Meals.Select(x => x.Value.Name);
+        var mappedMeals = menu.Items.Select(x => x.Meal.Name);
         var mappedResponse = new GetMenuResponse(menu.Id, menu.Date, mappedMeals);
         return Task.FromResult<GetMenuResponse?>(mappedResponse);
     }
