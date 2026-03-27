@@ -1,24 +1,24 @@
 using AwesomeAssertions;
 using MealPlanner.Domain;
-using MealPlanner.Services.DailyMenus.Read;
+using MealPlanner.Services.Menus.Read;
 
 namespace MealPlanner.Services.Tests;
 
-public class DailyMenuReaderTests
+public class MenuReaderTests
 {
     private static readonly DateOnly Today = DateOnly.FromDateTime(DateTime.Today);
     
     private readonly InMemoryDatabase _ctx;
-    private readonly DailyMenuReader _sut;
+    private readonly MenuReader _sut;
 
-    public DailyMenuReaderTests()
+    public MenuReaderTests()
     {
         _ctx = new InMemoryDatabase();
-        _sut = new DailyMenuReader(_ctx);
+        _sut = new MenuReader(_ctx);
     }
     
     [Fact]
-    public async Task GetById_ReturnsNull_WhenDailyMenuDoesNotExist()
+    public async Task GetById_ReturnsNull_WhenMenuDoesNotExist()
     {
         // Arrange 
         var id = Guid.NewGuid();
@@ -31,23 +31,23 @@ public class DailyMenuReaderTests
     }
     
     [Fact]
-    public async Task GetById_ReturnsDailyMenuIfExists()
+    public async Task GetById_ReturnsMenuIfExists()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(Today);
-        _ctx.Database[dailyMenu.Id] = dailyMenu;
+        var menu = Menu.Create(Today);
+        _ctx.Database[menu.Id] = menu;
         
         // Act
-        var result = await _sut.Get(dailyMenu.Id);
+        var result = await _sut.Get(menu.Id);
         
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(dailyMenu.Id);
-        result.Date.Should().Be(dailyMenu.Date);
+        result.Id.Should().Be(menu.Id);
+        result.Date.Should().Be(menu.Date);
     }
 
     [Fact]
-    public async Task GetForDate_ReturnsNull_WhenDailyMenuDoesNotExist()
+    public async Task GetForDate_ReturnsNull_WhenMenuDoesNotExist()
     {
         // Arrange 
         var id = Guid.NewGuid();
@@ -60,19 +60,19 @@ public class DailyMenuReaderTests
     }
     
     [Fact]
-    public async Task GetForDate_ReturnsDailyMenuIfExists()
+    public async Task GetForDate_ReturnsMenuIfExists()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(Today);
-        _ctx.Database[dailyMenu.Id] = dailyMenu;
+        var menu = Menu.Create(Today);
+        _ctx.Database[menu.Id] = menu;
         
         // Act
         var result = await _sut.Get(Today);
         
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(dailyMenu.Id);
-        result.Date.Should().Be(dailyMenu.Date);
+        result.Id.Should().Be(menu.Id);
+        result.Date.Should().Be(menu.Date);
     }
     
 }

@@ -3,7 +3,7 @@ using MealsCollection = System.Collections.Concurrent.ConcurrentDictionary<int, 
 
 namespace MealPlanner.Domain;
 
-public class DailyMenu
+public class Menu
 {
     public static readonly DateOnly MinDateInThePast = new(2019, 9, 28);
 
@@ -17,7 +17,7 @@ public class DailyMenu
         private set => value.ToList().ForEach(TryAddMeal);
     }
 
-    private DailyMenu(DateOnly date, MealsCollection meals)
+    private Menu(DateOnly date, MealsCollection meals)
     {
         Date = date;
         Meals = meals;
@@ -39,7 +39,7 @@ public class DailyMenu
         ValidateMealAndThrow(meal);
         if (!_meals.TryAdd(order, meal))
         {
-            throw new InvalidOperationException($"Could not add meal to daily menu due to an error.");
+            throw new InvalidOperationException($"Could not add meal to menu due to an error.");
         }
     }
 
@@ -66,14 +66,14 @@ public class DailyMenu
     {
         if (_meals.Values.Any(meal.Equals))
         {
-            throw new InvalidOperationException($"Meal '{meal}' is already present in the daily menu for {Date}.");
+            throw new InvalidOperationException($"Meal '{meal}' is already present in the menu for {Date}.");
         }
     }
     
-    public static DailyMenu Create(DateOnly date)
+    public static Menu Create(DateOnly date)
     {
         ValidateDateAndThrow(date);
-        return new DailyMenu(date, new MealsCollection());
+        return new Menu(date, new MealsCollection());
     }
 
     private static void ValidateDateAndThrow(DateOnly date)

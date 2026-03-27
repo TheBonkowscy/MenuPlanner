@@ -1,4 +1,4 @@
-using MealPlanner.API.DailyMenus;
+using MealPlanner.API.Menus;
 using MealPlanner.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -13,7 +13,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<InMemoryDatabase>();
-await builder.Services.RegisterDailyMenuServices();
+await builder.Services.RegisterMenuServices();
 
 var app = builder.Build();
 
