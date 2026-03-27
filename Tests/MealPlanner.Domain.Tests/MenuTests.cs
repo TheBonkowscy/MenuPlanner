@@ -2,22 +2,22 @@ using AwesomeAssertions;
 
 namespace MealPlanner.Domain.Tests;
 
-public class DailyMenuTests
+public class MenuTests
 {
     private static readonly DateOnly SharedDate = DateOnly.FromDateTime(DateTime.UtcNow);
     private static readonly Meal SharedFirstMeal = Meal.Create("Fish and chips");
     private static readonly Meal SharedSecondMeal = Meal.Create("Pierogi");
-    private static readonly string InvalidDateExceptionMessage = $"Invalid date specified. The date can not be before {DailyMenu.MinDateInThePast} and must be in the near future.";
+    private static readonly string InvalidDateExceptionMessage = $"Invalid date specified. The date can not be before {Menu.MinDateInThePast} and must be in the near future.";
 
     [Theory]
     [MemberData(nameof(InvalidDatesSource))]
     public void Create_ThrowsForInvalidDate(DateOnly invalidDate)
     {
         // Act
-        Action<DateOnly> createNewDailyMenu = date => DailyMenu.Create(date);
+        Action<DateOnly> createNewMenu = date => Menu.Create(date);
         
         // Assert
-        createNewDailyMenu.Invoking(x => x.Invoke(invalidDate))
+        createNewMenu.Invoking(x => x.Invoke(invalidDate))
             .Should().Throw<ArgumentOutOfRangeException>()
             .WithMessage(InvalidDateExceptionMessage);
     }
@@ -27,7 +27,7 @@ public class DailyMenuTests
     public void Create_CreatesSuccessfully(DateOnly validDate)
     {
         // Act
-        var result = DailyMenu.Create(validDate);
+        var result = Menu.Create(validDate);
         
         // Assert
         result.Date.Should().Be(validDate);
@@ -37,77 +37,75 @@ public class DailyMenuTests
     public void AddMeal_WithoutOrder_SuccessfullyAddsMeal()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
+        var menu = Menu.Create(SharedDate);
         
         // Act
-        dailyMenu.AddMeal(SharedFirstMeal);
+        menu.AddMeal(SharedFirstMeal);
         
         // Assert
-        dailyMenu.Meals.Should().HaveCount(1);
-        dailyMenu.Meals.Values.First().Should().Be(SharedFirstMeal);
+        menu.Items.Should().HaveCount(1);
+        menu.GetMeal(0).Should().Be(SharedFirstMeal);
     }
 
     [Fact]
     public void AddMeal_WithoutOrder_KeepsOrder()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
-        dailyMenu.AddMeal(SharedFirstMeal);
+        var menu = Menu.Create(SharedDate);
+        menu.AddMeal(SharedFirstMeal);
         
         // Act
-        dailyMenu.AddMeal(SharedSecondMeal);
+        menu.AddMeal(SharedSecondMeal);
         
         // Assert
-        dailyMenu.Meals.Should().HaveCount(2);
-        var actualFirstMeal = dailyMenu.Meals[0];
-        actualFirstMeal.Should().Be(SharedFirstMeal);
-        var actualSecondMeal = dailyMenu.Meals[1];
-        actualSecondMeal.Should().Be(SharedSecondMeal);
+        menu.Items.Should().HaveCount(2);
+        menu.GetMeal(0).Should().Be(SharedFirstMeal);
+        menu.GetMeal(1).Should().Be(SharedSecondMeal);
     }
 
     [Fact]
     public void AddMeal_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
-        dailyMenu.AddMeal(SharedFirstMeal);
+        var menu = Menu.Create(SharedDate);
+        menu.AddMeal(SharedFirstMeal);
         
         // Act
-        Action<Meal> addMealToDailyMenu = newMeal => dailyMenu.AddMeal(newMeal);
+        Action<Meal> addMealToMenu = newMeal => menu.AddMeal(newMeal);
         
         // Assert
-        addMealToDailyMenu.Invoking(x => x.Invoke(SharedFirstMeal))
+        addMealToMenu.Invoking(x => x.Invoke(SharedFirstMeal))
             .Should().Throw<InvalidOperationException>()
-            .WithMessage($"Meal '{SharedFirstMeal}' is already present in the daily menu for {dailyMenu.Date}.");
+            .WithMessage($"Meal '{SharedFirstMeal}' is already present in the menu for {menu.Date}.");
     }
 
     [Fact]
     public void AddMeal_WithOrder_SuccessfullyAddsMeal()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
+        var menu = Menu.Create(SharedDate);
         
         // Act
-        dailyMenu.AddMeal(0, SharedFirstMeal);
+        menu.AddMeal(0, SharedFirstMeal);
         
         // Assert
-        dailyMenu.Meals.Should().HaveCount(1);
-        dailyMenu.Meals.Values.Should().Contain(x => x.Name == SharedFirstMeal.Name);
+        menu.Items.Should().HaveCount(1);
+        menu.GetMeal(0)!.Name.Should().Be(SharedFirstMeal.Name);
     }
 
     [Fact]
     public void AddMeal_WithOrder_WhenOrderAlreadyTaken_ThrowsException()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
+        var menu = Menu.Create(SharedDate);
         const int mealOrder = 0;
-        dailyMenu.AddMeal(mealOrder, SharedFirstMeal);
+        menu.AddMeal(mealOrder, SharedFirstMeal);
         
         // Act
-        Action<int, Meal> addMealToDailyMenu = (order, meal) =>  dailyMenu.AddMeal(order, meal);
+        Action<int, Meal> addMealToMenu = (order, meal) =>  menu.AddMeal(order, meal);
         
         // Assert
-        addMealToDailyMenu.Invoking(x => x.Invoke(mealOrder, SharedSecondMeal))
+        addMealToMenu.Invoking(x => x.Invoke(mealOrder, SharedSecondMeal))
             .Should().Throw<InvalidOperationException>()
             .WithMessage($"There is already a meal added as #{mealOrder + 1} in the day");
     }
@@ -116,29 +114,29 @@ public class DailyMenuTests
     public void AddMeal_WithOrder_WithMealAlreadyAdded_ThrowsException()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
-        dailyMenu.AddMeal(SharedFirstMeal);
+        var menu = Menu.Create(SharedDate);
+        menu.AddMeal(SharedFirstMeal);
         
         // Act
-        Action<int, Meal> addMealToDailyMenu = (order, meal) =>  dailyMenu.AddMeal(order, meal);
+        Action<int, Meal> addMealToMenu = (order, meal) =>  menu.AddMeal(order, meal);
         
         // Assert
-        addMealToDailyMenu.Invoking(x => x.Invoke(1, SharedFirstMeal))
+        addMealToMenu.Invoking(x => x.Invoke(1, SharedFirstMeal))
             .Should().Throw<InvalidOperationException>()
-            .WithMessage($"Meal '{SharedFirstMeal}' is already present in the daily menu for {dailyMenu.Date}.");
+            .WithMessage($"Meal '{SharedFirstMeal}' is already present in the menu for {menu.Date}.");
     }
 
     [Fact]
     public void AddMeal_WithOrder_ThrowsExceptionForNegativeOrder()
     {
         // Arrange
-        var dailyMenu = DailyMenu.Create(SharedDate);
+        var menu = Menu.Create(SharedDate);
         
         // Act
-        Action<int, Meal> addMealToDailyMenu = (order, meal) => dailyMenu.AddMeal(order, meal);
+        Action<int, Meal> addMealToMenu = (order, meal) => menu.AddMeal(order, meal);
         
         // Assert
-        addMealToDailyMenu.Invoking(x => x.Invoke(-1, SharedFirstMeal))
+        addMealToMenu.Invoking(x => x.Invoke(-1, SharedFirstMeal))
             .Should().Throw<ArgumentOutOfRangeException>()
             .WithMessage("Order must be a positive number.");
     }
@@ -151,7 +149,7 @@ public class DailyMenuTests
             {
                 DateOnly.MinValue,
                 DateOnly.MaxValue, 
-                DailyMenu.MinDateInThePast.AddDays(-1),
+                Menu.MinDateInThePast.AddDays(-1),
                 DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100).AddDays(1)
                 
             };
@@ -166,7 +164,7 @@ public class DailyMenuTests
             var data = new TheoryData<DateOnly>
             {
                 DateOnly.FromDateTime(DateTime.UtcNow),
-                DailyMenu.MinDateInThePast,
+                Menu.MinDateInThePast,
                 DateOnly.FromDateTime(DateTime.UtcNow).AddYears(100)
                 
             };
