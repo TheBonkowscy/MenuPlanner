@@ -5,13 +5,13 @@ namespace MealPlanner.Services.Menus.Read;
 
 public interface IReadMenu
 {
-    Task<GetMenuResponse?> Get(Guid id);
+    Task<GetMenuResponse?> Get(int id);
     Task<GetMenuResponse?> Get(DateOnly date);
 }
 
 public class MenuReader(InMemoryDatabase ctx) : IReadMenu
 {
-    public Task<GetMenuResponse?> Get(Guid id)
+    public Task<GetMenuResponse?> Get(int id)
     {
         if (!ctx.Database.TryGetValue(id, out var menu))
         {

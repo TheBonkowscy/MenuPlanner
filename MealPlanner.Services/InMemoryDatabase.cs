@@ -5,5 +5,5 @@ namespace MealPlanner.Services;
 
 public class InMemoryDatabase
 {
-    public IDictionary<Guid, Menu> Database { get; } = new ConcurrentDictionary<Guid, Menu>();
+    public IDictionary<int, Menu> Database { get; } = new ConcurrentDictionary<int, Menu>();
 }

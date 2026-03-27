@@ -20,11 +20,8 @@ public class MenuReaderTests
     [Fact]
     public async Task GetById_ReturnsNull_WhenMenuDoesNotExist()
     {
-        // Arrange 
-        var id = Guid.NewGuid();
-        
         // Act
-        var result = await _sut.Get(id);
+        var result = await _sut.Get(1);
         
         // Assert
         result.Should().BeNull();
@@ -49,9 +46,6 @@ public class MenuReaderTests
     [Fact]
     public async Task GetForDate_ReturnsNull_WhenMenuDoesNotExist()
     {
-        // Arrange 
-        var id = Guid.NewGuid();
-        
         // Act
         var result = await _sut.Get(Today);
         

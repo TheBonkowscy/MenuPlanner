@@ -28,7 +28,7 @@ public class MenuIntegrationTests : IntegrationTestBase
         result.EnsureSuccessStatusCode();
         var response = await result.Content.ReadFromJsonAsync<CreateMenuResponse>();
         response.Should().NotBeNull();
-        response.Id.Should().NotBe(Guid.Empty);
+        response.Id.Should().NotBe(0);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class MenuIntegrationTests : IntegrationTestBase
     public async Task Get_ById_ReturnsNotFound_WhenMenuDoesNotExist()
     {
         // Act
-        var result = await Client.GetAsync(BuildGetRoute(Guid.NewGuid()));
+        var result = await Client.GetAsync(BuildGetRoute(1));
         
         // Assert
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -115,7 +115,7 @@ public class MenuIntegrationTests : IntegrationTestBase
         response.Date.Should().Be(Today);
     }
 
-    private static string BuildGetRoute(Guid id) => $"{Constants.MenuRoute}/{id.ToString()}";
+    private static string BuildGetRoute(int id) => $"{Constants.MenuRoute}/{id.ToString()}";
 
     private static string BuildGetRoute(DateOnly date) => $"{Constants.MenuRoute}/{date.ToString("O")}";
     
